@@ -17,10 +17,17 @@ Plugin id: `sippin45.mwb`
 - **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 
-The bar icon is the Mouse Without Borders icon (`assets/mwb.png`, from
-[microsoft/PowerToys](https://github.com/microsoft/PowerToys/blob/main/doc/images/icons/MouseWithoutBorders.png),
-MIT licensed), shown in its own colours. Connection state shows in the panel
-and the tooltip, not in the icon.
+The bar icon is the Mouse Without Borders icon from
+[microsoft/PowerToys](https://github.com/microsoft/PowerToys/blob/main/doc/images/icons/MouseWithoutBorders.png)
+(MIT licensed), reduced to one colour and tinted with the bar's foreground, so
+it matches the other icons and follows the theme. `assets/mwb.png` is the
+original; `assets/mwb-mono.png` is the mask the panel loads, regenerated with:
+
+```sh
+cd tools/mono && go run . ../../assets/mwb.png ../../assets/mwb-mono.png
+```
+
+Connection state shows in the panel and the tooltip, not in the icon.
 
 ## How it works
 
