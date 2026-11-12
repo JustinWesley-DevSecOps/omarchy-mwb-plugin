@@ -17,8 +17,10 @@ Plugin id: `sippin45.mwb`
 - **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 
-The icon is drawn in QML after the Mouse Without Borders mark (two screens and a cursor) in the bar's foreground colour; connection state shows in the panel and
-the tooltip, not in the icon colour.
+The bar icon is the Mouse Without Borders icon (`assets/mwb.png`, from
+[microsoft/PowerToys](https://github.com/microsoft/PowerToys/blob/main/doc/images/icons/MouseWithoutBorders.png),
+MIT licensed), shown in its own colours. Connection state shows in the panel
+and the tooltip, not in the icon.
 
 ## How it works
 
