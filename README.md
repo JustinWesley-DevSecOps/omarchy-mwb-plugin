@@ -22,6 +22,14 @@ two arrows (a chevron head and a bar each) pointing at each other, with two diam
 foreground colour so it matches the other icons and follows the theme.
 Connection state shows in the panel and the tooltip, not in the icon.
 
+`design/mwb-icon.svg` is the same mark as editable vector art (six paths, one per
+glyph, with a guides layer). It is generated from the font's outlines, using
+the same layout numbers as `IconMark.qml`:
+
+```sh
+python3 tools/glyphs2svg.py
+```
+
 ## How it works
 
 QML does no file or service work itself. It calls a small Go helper,

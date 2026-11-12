@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <title>Mouse Without Borders bar icon</title>
+  <desc>Outlines taken from the JetBrainsMono Nerd Font glyphs U+F0374 (shaft), U+F0142 and U+F0141 (heads) and U+F0A10 (diamond), laid out as in IconMark.qml. Each piece is its own path so it can be moved, resized or replaced.</desc>
+  <!-- guides: delete or hide -->
+  <g id="guides" fill="none" stroke="#7aa" stroke-width="1" stroke-dasharray="4 4" opacity="0.6">
+    <rect x="0.5" y="0.5" width="399" height="399"/>
+    <line x1="0" y1="200" x2="400" y2="200"/>
+    <line x1="200" y1="0" x2="200" y2="400"/>
+  </g>
+  <g id="icon" fill="#f5d9a8">
+    <path id="shaft-left" d="M200.00 214.09L0.00 214.09L0.00 185.91L200.00 185.91L200.00 214.09Z"/>
+    <path id="shaft-right" d="M400.00 214.09L200.00 214.09L200.00 185.91L400.00 185.91L400.00 214.09Z"/>
+    <path id="head-left" d="M55.57 285.57L141.58 200.00L55.57 114.43L82.00 88.00L194.00 200.00L82.00 312.00L55.57 285.57Z"/>
+    <path id="head-right" d="M344.43 285.57L258.42 200.00L344.43 114.43L318.00 88.00L206.00 200.00L318.00 312.00L344.43 285.57Z"/>
+    <path id="diamond-left" d="M162.00 74.07Q159.23 74.07 157.43 75.87L131.94 101.36Q130.00 103.30 130.07 106.00Q130.14 108.70 131.94 110.50L157.43 135.99Q159.37 137.93 162.07 137.86Q164.77 137.79 166.57 135.99L192.06 110.50Q194.00 108.56 193.93 105.86Q193.86 103.16 192.06 101.36L166.57 75.87Q164.77 74.07 162.00 74.07Z"/>
+    <path id="diamond-right" d="M238.00 74.07Q235.23 74.07 233.43 75.87L207.94 101.36Q206.00 103.30 206.07 106.00Q206.14 108.70 207.94 110.50L233.43 135.99Q235.37 137.93 238.07 137.86Q240.77 137.79 242.57 135.99L268.06 110.50Q270.00 108.56 269.93 105.86Q269.86 103.16 268.06 101.36L242.57 75.87Q240.77 74.07 238.00 74.07Z"/>
+  </g>
+</svg>
