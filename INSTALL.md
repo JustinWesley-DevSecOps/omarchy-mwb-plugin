@@ -6,7 +6,7 @@
 cd ~/path/to/omarchy-mwb-plugin
 ./build.sh                       # builds bin/mwbcfg (needs Go)
 ln -s "$PWD" ~/.config/omarchy/plugins/sippin45.mwb
-omarchy plugin validate ~/.config/omarchy/plugins/sippin45.mwb
+omarchy plugin validate "$PWD"        # validate the project folder, not the symlink
 ```
 
 The symlink makes this project the source of truth. Do not keep a second copy
