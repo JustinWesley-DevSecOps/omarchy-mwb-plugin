@@ -36,7 +36,6 @@ Panel {
   property string conn: "unknown"
   property bool needsRestart: false
   property bool busy: false
-  property bool restarting: false
   property string message: ""
   property bool messageIsError: false
   property bool helperMissing: false
@@ -53,7 +52,6 @@ Panel {
   readonly property bool canToggle: svcState !== "unknown" && svcState !== "deactivating" && !busy
 
   function stateLabel() {
-    if (restarting) return strings.t("state.restarting")
     var s = strings.t("state." + svcState)
     if (svcState === "active" && (conn === "connected" || conn === "connecting"))
       s += " · " + strings.t("conn." + conn)
@@ -88,9 +86,8 @@ Panel {
     })
   }
 
-  function refreshStatus(done) {
+  function refreshStatus() {
     run([helperPath, "status"], "", function(r) {
-      if (done) done()
       if (!r.ok) return
       svcState = r.state
       conn = r.conn
@@ -101,13 +98,11 @@ Panel {
   function serviceAction(action) {
     if (busy) return
     busy = true
-    restarting = action === "restart"
     say("", false)
     run([helperPath, "action", action], "", function(r) {
       busy = false
       if (!r.ok) say(r.error, true)
-      // Keep showing "Restarting" until the next status read confirms the result.
-      refreshStatus(function() { restarting = false })
+      refreshStatus()
     })
   }
 
@@ -203,7 +198,7 @@ Panel {
           fontFamily: root.fontFamily
           trailingControl: Component {
             ToggleSwitch {
-              checked: root.running || root.restarting
+              checked: root.running
               busy: root.busy
               enabled: root.canToggle
               foreground: root.foreground
