@@ -15,6 +15,10 @@ Panel {
   moduleName: "sippin45.mwb"
   ipcTarget: "sippin45.mwb"
 
+  // The bar sizes the widget from these; without them it collapses to zero.
+  implicitWidth: button.implicitWidth
+  implicitHeight: button.implicitHeight
+
   readonly property string pluginDir: String(Qt.resolvedUrl(".")).replace(/^file:\/\//, "").replace(/\/+$/, "")
   readonly property string helperPath: pluginDir + "/bin/mwbcfg"
 
@@ -164,7 +168,7 @@ Panel {
     bar: root.bar
     text: "󰍽"
     active: root.opened
-    tooltipText: strings.tn ? strings.t("tooltip").arg(root.stateLabel()) : ""
+    tooltipText: strings.t("tooltip").arg(root.stateLabel())
     onPressed: function(buttonCode) { root.toggle() }
   }
 
