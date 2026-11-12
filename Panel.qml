@@ -48,9 +48,8 @@ Panel {
 
   readonly property bool dirty: cfgLoaded && (draftHost !== cfg.host || draftKey !== ""
     || draftFileFetch !== cfg.fileFetch || draftClipboard !== cfg.clipboard)
-  readonly property bool canStart: svcState === "inactive" || svcState === "failed"
-  readonly property bool canStop: svcState === "active" || svcState === "activating"
-  readonly property bool canRestart: svcState !== "unknown" && svcState !== "deactivating"
+  readonly property bool running: svcState === "active" || svcState === "activating"
+  readonly property bool canToggle: svcState !== "unknown" && svcState !== "deactivating" && !busy
 
   function stateLabel() {
     var s = strings.t("state." + svcState)
@@ -201,6 +200,15 @@ Panel {
           meta: root.stateLabel()
           foreground: root.foreground
           fontFamily: root.fontFamily
+          trailingControl: Component {
+            ToggleSwitch {
+              checked: root.running
+              busy: root.busy
+              enabled: root.canToggle
+              foreground: root.foreground
+              onToggled: root.serviceAction(root.running ? "stop" : "start")
+            }
+          }
         }
 
         Text {
@@ -212,34 +220,6 @@ Panel {
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
           text: strings.t("needsRestart")
-        }
-
-        Row {
-          spacing: Style.space(8)
-          Button {
-            text: strings.t("start")
-            bordered: true
-            enabled: root.canStart && !root.busy
-            opacity: enabled ? 1 : 0.4
-            fontFamily: root.fontFamily
-            onClicked: root.serviceAction("start")
-          }
-          Button {
-            text: strings.t("stop")
-            bordered: true
-            enabled: root.canStop && !root.busy
-            opacity: enabled ? 1 : 0.4
-            fontFamily: root.fontFamily
-            onClicked: root.serviceAction("stop")
-          }
-          Button {
-            text: strings.t("restart")
-            bordered: true
-            enabled: root.canRestart && !root.busy
-            opacity: enabled ? 1 : 0.4
-            fontFamily: root.fontFamily
-            onClicked: root.serviceAction("restart")
-          }
         }
 
         PanelSeparator { foreground: root.foreground }
