@@ -6,6 +6,7 @@
   "state.failed": "Failed",
   "state.activating": "Starting",
   "state.deactivating": "Stopping",
+  "state.restarting": "Restarting",
   "state.unknown": "Unknown",
   "conn.connected": "connected",
   "conn.connecting": "connecting",
