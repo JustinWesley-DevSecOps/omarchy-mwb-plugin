@@ -163,7 +163,6 @@ Panel {
     anchors.fill: parent
     bar: root.bar
     text: "󰍽"
-    active: root.opened
     tooltipText: strings.t("tooltip").arg(root.stateLabel())
     onPressed: function(buttonCode) { root.toggle() }
   }
