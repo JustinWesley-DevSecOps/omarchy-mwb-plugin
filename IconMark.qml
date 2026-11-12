@@ -2,11 +2,11 @@ import QtQuick
 import qs.Ui
 
 // The bar mark, built from glyphs of the bar's own icon font: two arrows
-// pointing at each other and meeting in the middle, with two small diamonds
-// above the meeting point. One colour, so it follows the bar's foreground.
+// pointing at each other and meeting in the middle, with two diamonds nested in
+// the V formed by the arrowheads' upper arms. One colour, so it follows the
+// bar's foreground.
 //
-// The font's arrows are thin, so each is drawn several times a hair apart to
-// thicken it, the way a glyph is emboldened.
+// Each arrow is an open chevron for the head plus a bar for the shaft.
 Item {
   id: root
 
@@ -14,62 +14,86 @@ Item {
   property string fontFamily: "JetBrainsMono Nerd Font"
 
   readonly property real s: Math.min(width, height)
+  readonly property real midY: s * 0.5
 
-  readonly property real arrowBox: s * 0.5
-  readonly property real arrowY: s * 0.66
-  readonly property real weight: s * 0.016
-  // The bar fixes the mark's overall width, so the arrows grow taller instead.
-  readonly property real arrowStretch: 1.4
-  readonly property var offsets: [
-    [0, 0], [-1, 0], [1, 0], [0, -1], [0, 1],
-    [-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]
-  ]
+  // arrowheads: tip on each side of the centre line
+  readonly property real headBox: s * 0.56
+  readonly property real tipGap: s * 0.015
+  // shafts run from the outer edge to the head
+  readonly property real shaftBox: s * 0.5
+  // The bar font's minus measures higher than it draws; this puts it back on
+  // the centre line.
+  readonly property real shaftDy: s * 0.0875
 
-  readonly property real diamondBox: s * 0.3
-  readonly property real diamondY: s * 0.17
+  // diamonds, inside the V above the tips
+  readonly property real diamondBox: s * 0.16
+  readonly property real diamondY: midY - s * 0.235
+  readonly property real diamondDx: s * 0.095
 
-  // 󰁔 arrow-right, coming in from the left
+  // shafts: 󰍴 minus
   Repeater {
-    model: root.offsets
+    model: 1
     OpticalGlyph {
-      required property var modelData
-      x: root.s * 0.5 - width + modelData[0] * root.weight
-      y: root.arrowY - height / 2 + modelData[1] * root.weight
-      width: root.arrowBox
-      height: root.arrowBox
-      text: "󰁔"
+      x: 0
+      y: root.midY - height / 2 + root.shaftDy
+      width: root.shaftBox
+      height: root.shaftBox
+      text: "󰍴"
       fontFamily: root.fontFamily
       fontSize: 64
-      paintedSize: root.arrowBox
+      paintedSize: root.shaftBox
       color: root.ink
-      transform: Scale { origin.y: height / 2; yScale: root.arrowStretch }
+    }
+  }
+  Repeater {
+    model: 1
+    OpticalGlyph {
+      x: root.s - width
+      y: root.midY - height / 2 + root.shaftDy
+      width: root.shaftBox
+      height: root.shaftBox
+      text: "󰍴"
+      fontFamily: root.fontFamily
+      fontSize: 64
+      paintedSize: root.shaftBox
+      color: root.ink
     }
   }
 
-  // 󰁍 arrow-left, coming in from the right
-  Repeater {
-    model: root.offsets
-    OpticalGlyph {
-      required property var modelData
-      x: root.s * 0.5 + modelData[0] * root.weight
-      y: root.arrowY - height / 2 + modelData[1] * root.weight
-      width: root.arrowBox
-      height: root.arrowBox
-      text: "󰁍"
-      fontFamily: root.fontFamily
-      fontSize: 64
-      paintedSize: root.arrowBox
-      color: root.ink
-      transform: Scale { origin.y: height / 2; yScale: root.arrowStretch }
-    }
+  // head of the left arrow, pointing right: 󰅂 chevron-right
+  OpticalGlyph {
+    id: headLeft
+    x: root.s * 0.5 - root.tipGap - width / 2 - paintedWidth / 2
+    y: root.midY - height / 2
+    width: root.headBox
+    height: root.headBox
+    text: "󰅂"
+    fontFamily: root.fontFamily
+    fontSize: 64
+    paintedSize: root.headBox
+    color: root.ink
   }
 
-  // 󰨐 two diamonds above the meeting point
+  // head of the right arrow, pointing left: 󰅁 chevron-left
+  OpticalGlyph {
+    id: headRight
+    x: root.s * 0.5 + root.tipGap - width / 2 + paintedWidth / 2
+    y: root.midY - height / 2
+    width: root.headBox
+    height: root.headBox
+    text: "󰅁"
+    fontFamily: root.fontFamily
+    fontSize: 64
+    paintedSize: root.headBox
+    color: root.ink
+  }
+
+  // two diamonds: 󰨐
   Repeater {
-    model: [0.33, 0.67]
+    model: [-1, 1]
     OpticalGlyph {
-      required property real modelData
-      x: root.s * modelData - width / 2
+      required property int modelData
+      x: root.s * 0.5 + modelData * root.diamondDx - width / 2
       y: root.diamondY - height / 2
       width: root.diamondBox
       height: root.diamondBox

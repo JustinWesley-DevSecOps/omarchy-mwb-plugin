@@ -18,7 +18,7 @@ Plugin id: `sippin45.mwb`
   the changes are not applied yet.
 
 The bar icon is built from glyphs of the bar's own icon font (`IconMark.qml`):
-two arrows pointing at each other with two small diamonds above, in the bar's
+two arrows (a chevron head and a bar each) pointing at each other, with two diamonds nested between the heads, in the bar's
 foreground colour so it matches the other icons and follows the theme.
 Connection state shows in the panel and the tooltip, not in the icon.
 
