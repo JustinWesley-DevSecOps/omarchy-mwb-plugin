@@ -202,7 +202,6 @@ Panel {
         PanelHero {
           width: parent.width
           title: strings.t("title")
-          meta: root.stateLabel()
           foreground: root.foreground
           fontFamily: root.fontFamily
           trailingControl: Component {
@@ -214,17 +213,6 @@ Panel {
               onToggled: root.serviceAction(root.running ? "stop" : "start")
             }
           }
-        }
-
-        Text {
-          width: parent.width
-          visible: root.needsRestart && !root.dirty
-          textFormat: Text.PlainText
-          wrapMode: Text.WordWrap
-          color: root.urgent
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          text: strings.t("needsRestart")
         }
 
         PanelSeparator { foreground: root.foreground }
@@ -360,13 +348,42 @@ Panel {
           }
         }
 
-        Text {
-          visible: root.dirty
-          textFormat: Text.PlainText
-          color: root.dim
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          text: strings.t("unsaved")
+        PanelSeparator { foreground: root.foreground }
+
+        // Status: where the service is, and anything still waiting on you.
+        Column {
+          width: parent.width
+          spacing: Style.space(2)
+
+          Text {
+            width: parent.width
+            textFormat: Text.PlainText
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            text: root.stateLabel()
+          }
+          Text {
+            width: parent.width
+            visible: root.dirty
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+            color: root.dim
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            text: strings.t("unsaved")
+          }
+          Text {
+            width: parent.width
+            visible: root.needsRestart && !root.dirty
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+            color: root.dim
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            text: strings.t("needsRestart")
+          }
         }
       }
     }
