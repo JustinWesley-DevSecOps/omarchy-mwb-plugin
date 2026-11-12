@@ -8,6 +8,10 @@ Plugin id: `sippin45.mwb`
 
 ## Panel
 
+![The Mouse Without Borders panel](docs/panel.png)
+
+(The host address in the screenshot is a placeholder.)
+
 - **Status** line: Running / Stopped / Failed, plus connected or connecting
   (read from the last 50 journal lines of `mwb.service`).
 - **On/off switch** beside the title: on while the service runs. Flipping it runs `systemctl --user start|stop mwb`; `systemctl` errors show as text. To apply saved settings, turn it off and on.
