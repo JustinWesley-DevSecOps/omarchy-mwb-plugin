@@ -111,11 +111,8 @@ Panel {
     })
   }
 
-  function save(restartAfter) {
-    if (busy || !dirty) {
-      if (restartAfter && !busy) serviceAction("restart")
-      return
-    }
+  function save() {
+    if (busy || !dirty) return
     busy = true
     say("", false)
     var change = { host: draftHost.trim(), file_fetch: draftFileFetch, clipboard: draftClipboard }
@@ -126,8 +123,8 @@ Panel {
       draftKey = ""
       showKey = false
       loadConfig()
-      if (restartAfter) { say(strings.t("savedRestarted"), false); serviceAction("restart") }
-      else { say(strings.t("saved"), false); refreshStatus() }
+      say(strings.t("saved"), false)
+      refreshStatus()
     })
   }
 
@@ -244,7 +241,7 @@ Panel {
               text: root.draftHost
               onTextEdited: root.draftHost = text
               Keys.onEscapePressed: root.close()
-              onAccepted: root.save(false)
+              onAccepted: root.save()
             }
             Button {
               id: testButton
@@ -280,7 +277,7 @@ Panel {
               text: root.draftKey
               onTextEdited: root.draftKey = text
               Keys.onEscapePressed: root.close()
-              onAccepted: root.save(false)
+              onAccepted: root.save()
             }
             Button {
               id: showButton
@@ -335,16 +332,7 @@ Panel {
             enabled: root.dirty && !root.busy
             opacity: enabled ? 1 : 0.4
             fontFamily: root.fontFamily
-            onClicked: root.save(false)
-          }
-          Button {
-            text: strings.t("saveRestart")
-            bordered: true
-            selected: root.dirty
-            enabled: (root.dirty || root.needsRestart) && !root.busy
-            opacity: enabled ? 1 : 0.4
-            fontFamily: root.fontFamily
-            onClicked: root.save(true)
+            onClicked: root.save()
           }
         }
 

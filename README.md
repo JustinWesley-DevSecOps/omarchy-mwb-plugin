@@ -10,12 +10,11 @@ Plugin id: `sippin45.mwb`
 
 - **Status** line: Running / Stopped / Failed, plus connected or connecting
   (read from the last 50 journal lines of `mwb.service`).
-- **On/off switch** beside the title: on while the service runs. Flipping it runs `systemctl --user start|stop mwb`; `systemctl` errors show as text. Restarting is done with **Save & restart**.
+- **On/off switch** beside the title: on while the service runs. Flipping it runs `systemctl --user start|stop mwb`; `systemctl` errors show as text. To apply saved settings, turn it off and on.
 - **Settings**: Windows host (with a *Test host* button that tries a TCP
   connect to the control port + 1, 2 s timeout), security key (masked, with
   Show/Hide), `file_fetch` (3-way select) and clipboard sharing.
-- **Save** writes the file. **Save & restart** writes it and restarts the
-  service. If the saved file is newer than the running service, the panel says
+- **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 
 The icon is a single neutral glyph; connection state shows in the panel and

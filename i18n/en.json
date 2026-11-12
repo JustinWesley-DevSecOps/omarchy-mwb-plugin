@@ -29,10 +29,8 @@
   "reachable": "%1 is reachable",
   "unreachable": "%1 did not answer",
   "save": "Save",
-  "saveRestart": "Save & restart",
   "saved": "Saved",
-  "savedRestarted": "Saved, restarting",
-  "needsRestart": "Saved settings are not applied yet. Restart the service.",
+  "needsRestart": "Saved settings are not applied yet. Turn the service off and on to apply them.",
   "unsaved": "Unsaved changes",
   "loadFailed": "Could not read the config",
   "helperMissing": "Helper binary not found. Build it (see INSTALL.md)."
