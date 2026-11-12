@@ -17,18 +17,17 @@ Plugin id: `sippin45.mwb`
 - **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 
-The bar icon is built from glyphs of the bar's own icon font (`IconMark.qml`):
-two arrows (a chevron head and a bar each) pointing at each other, with two diamonds nested between the heads, in the bar's
-foreground colour so it matches the other icons and follows the theme.
+The bar icon is `design/mwb-icon.svg`, loaded by the panel and tinted with the
+bar's foreground colour so it matches the other icons and follows the theme.
+Edit the SVG to change the icon; the plugin picks it up on the next shell
+restart. Keep the `guides` layer hidden when you save, or it will be drawn in
+the bar, and keep the artwork a single colour (the tint replaces its colours).
 Connection state shows in the panel and the tooltip, not in the icon.
 
-`design/mwb-icon.svg` is the same mark as editable vector art (six paths, one per
-glyph, with a guides layer). It is generated from the font's outlines, using
-the same layout numbers as `IconMark.qml`:
-
-```sh
-python3 tools/glyphs2svg.py
-```
+The first version of the SVG was generated from the bar font's glyph outlines
+(`JetBrainsMono Nerd Font`: minus, two chevrons and a diamond) by
+`tools/glyphs2svg.py`. Running it again **overwrites** the SVG, so it is only
+for starting over.
 
 ## How it works
 

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import qs.Commons
@@ -162,12 +163,26 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    // Two arrows meeting in the middle with two diamonds above, built from
-    // glyphs of the bar font (see IconMark.qml) in the bar's foreground colour.
+    // The icon is design/mwb-icon.svg, tinted with the bar's foreground so it
+    // matches the other icons and follows the theme. Edit the SVG, not this.
     iconComponent: Component {
-      IconMark {
-        ink: root.barForeground
-        fontFamily: root.fontFamily
+      Item {
+        Image {
+          id: art
+          anchors.fill: parent
+          visible: false
+          source: Qt.resolvedUrl("design/mwb-icon.svg")
+          sourceSize: Qt.size(96, 96)
+          fillMode: Image.PreserveAspectFit
+          smooth: true
+          mipmap: true
+        }
+        MultiEffect {
+          anchors.fill: art
+          source: art
+          colorization: 1.0
+          colorizationColor: root.barForeground
+        }
       }
     }
     tooltipText: strings.t("tooltip").arg(root.stateLabel())

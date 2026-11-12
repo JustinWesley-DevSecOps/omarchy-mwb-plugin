@@ -208,8 +208,8 @@ parts = [
 svg = [f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S:g} {S:g}" width="{S:g}" height="{S:g}">
   <title>Mouse Without Borders bar icon</title>
   <desc>Outlines taken from the JetBrainsMono Nerd Font glyphs U+F0374 (shaft), U+F0142 and U+F0141 (heads) and U+F0A10 (diamond), laid out as in IconMark.qml. Each piece is its own path so it can be moved, resized or replaced.</desc>
-  <!-- guides: delete or hide -->
-  <g id="guides" fill="none" stroke="#7aa" stroke-width="1" stroke-dasharray="4 4" opacity="0.6">
+  <!-- guides: hidden so the plugin does not draw them; show this layer while editing, hide it again before saving -->
+  <g id="guides" display="none" fill="none" stroke="#7aa" stroke-width="1" stroke-dasharray="4 4" opacity="0.6">
     <rect x="0.5" y="0.5" width="{S - 1:g}" height="{S - 1:g}"/>
     <line x1="0" y1="{mid:g}" x2="{S:g}" y2="{mid:g}"/>
     <line x1="{S / 2:g}" y1="0" x2="{S / 2:g}" y2="{S:g}"/>

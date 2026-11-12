@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
   <title>Mouse Without Borders bar icon</title>
   <desc>Outlines taken from the JetBrainsMono Nerd Font glyphs U+F0374 (shaft), U+F0142 and U+F0141 (heads) and U+F0A10 (diamond), laid out as in IconMark.qml. Each piece is its own path so it can be moved, resized or replaced.</desc>
-  <!-- guides: delete or hide -->
-  <g id="guides" fill="none" stroke="#7aa" stroke-width="1" stroke-dasharray="4 4" opacity="0.6">
+  <!-- guides: hidden so the plugin does not draw them; show this layer while editing, hide it again before saving -->
+  <g id="guides" display="none" fill="none" stroke="#7aa" stroke-width="1" stroke-dasharray="4 4" opacity="0.6">
     <rect x="0.5" y="0.5" width="399" height="399"/>
     <line x1="0" y1="200" x2="400" y2="200"/>
     <line x1="200" y1="0" x2="200" y2="400"/>
