@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "sippin45.mwb",
+  "name": "Mouse Without Borders",
+  "version": "0.1.0",
+  "author": "sippin45",
+  "license": "MIT",
+  "description": "Edit the mwb client's host, key and options, and start, stop or restart its service, from one bar panel.",
+  "kinds": ["bar-widget"],
+  "activation": "on-demand",
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Mouse Without Borders",
+    "description": "One bar icon and one panel: service status with Start, Stop and Restart, and the mwb settings.",
+    "category": "System",
+    "aliases": ["mwb", "mouse-without-borders"],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {},
+    "schema": []
+  }
+}
