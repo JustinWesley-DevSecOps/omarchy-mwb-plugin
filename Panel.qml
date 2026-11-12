@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import qs.Commons
@@ -163,27 +162,12 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    // The Mouse Without Borders icon from the PowerToys repository, reduced to a
-    // one-colour mask (assets/mwb-mono.png, made by tools/mono) and tinted with
-    // the bar's foreground so it matches the other icons and follows the theme.
+    // Two arrows meeting in the middle with two diamonds above, built from
+    // glyphs of the bar font (see IconMark.qml) in the bar's foreground colour.
     iconComponent: Component {
-      Item {
-        Image {
-          id: art
-          anchors.fill: parent
-          visible: false
-          source: Qt.resolvedUrl("assets/mwb-mono.png")
-          sourceSize: Qt.size(96, 96)
-          fillMode: Image.PreserveAspectFit
-          smooth: true
-          mipmap: true
-        }
-        MultiEffect {
-          anchors.fill: art
-          source: art
-          colorization: 1.0
-          colorizationColor: root.barForeground
-        }
+      IconMark {
+        ink: root.barForeground
+        fontFamily: root.fontFamily
       }
     }
     tooltipText: strings.t("tooltip").arg(root.stateLabel())
