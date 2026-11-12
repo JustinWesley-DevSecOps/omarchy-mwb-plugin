@@ -16,15 +16,17 @@ Item {
   readonly property real s: Math.min(width, height)
 
   readonly property real arrowBox: s * 0.5
-  readonly property real arrowY: s * 0.64
-  readonly property real weight: s * 0.032
+  readonly property real arrowY: s * 0.66
+  readonly property real weight: s * 0.016
+  // The bar fixes the mark's overall width, so the arrows grow taller instead.
+  readonly property real arrowStretch: 1.4
   readonly property var offsets: [
     [0, 0], [-1, 0], [1, 0], [0, -1], [0, 1],
     [-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]
   ]
 
-  readonly property real diamondBox: s * 0.27
-  readonly property real diamondY: s * 0.22
+  readonly property real diamondBox: s * 0.3
+  readonly property real diamondY: s * 0.17
 
   // 󰁔 arrow-right, coming in from the left
   Repeater {
@@ -40,6 +42,7 @@ Item {
       fontSize: 64
       paintedSize: root.arrowBox
       color: root.ink
+      transform: Scale { origin.y: height / 2; yScale: root.arrowStretch }
     }
   }
 
@@ -57,12 +60,13 @@ Item {
       fontSize: 64
       paintedSize: root.arrowBox
       color: root.ink
+      transform: Scale { origin.y: height / 2; yScale: root.arrowStretch }
     }
   }
 
   // 󰨐 two diamonds above the meeting point
   Repeater {
-    model: [0.38, 0.62]
+    model: [0.33, 0.67]
     OpticalGlyph {
       required property real modelData
       x: root.s * modelData - width / 2
