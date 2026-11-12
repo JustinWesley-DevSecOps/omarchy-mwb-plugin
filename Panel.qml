@@ -162,7 +162,64 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: "󰍽"
+    // Drawn after the Mouse Without Borders mark: a screen behind, a screen in
+    // front, and a cursor cut out of the front one. One colour, so it follows
+    // the bar's foreground like the other icons.
+    iconComponent: Component {
+      Item {
+        Canvas {
+          id: mark
+          // Artwork spans 184 x 154 units; keep that aspect.
+          width: parent.width
+          height: width * 154 / 184
+          anchors.centerIn: parent
+          property color ink: root.barForeground
+          onInkChanged: requestPaint()
+          onWidthChanged: requestPaint()
+          onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+            var k = width / 184
+            ctx.scale(k, k)
+            ctx.translate(-4, -18)
+            function rrect(x, y, w, h, r) {
+              ctx.beginPath()
+              ctx.moveTo(x + r, y)
+              ctx.arcTo(x + w, y, x + w, y + h, r)
+              ctx.arcTo(x + w, y + h, x, y + h, r)
+              ctx.arcTo(x, y + h, x, y, r)
+              ctx.arcTo(x, y, x + w, y, r)
+              ctx.closePath()
+            }
+            // back screen, dimmer
+            ctx.globalAlpha = 0.5
+            ctx.fillStyle = ink
+            rrect(4, 18, 146, 102, 14)
+            ctx.fill()
+            ctx.globalAlpha = 1
+            // gap around the front screen
+            ctx.globalCompositeOperation = "destination-out"
+            rrect(34, 66, 154, 106, 14)
+            ctx.lineWidth = 14
+            ctx.stroke()
+            ctx.globalCompositeOperation = "source-over"
+            // front screen
+            ctx.fillStyle = ink
+            rrect(34, 66, 154, 106, 14)
+            ctx.fill()
+            // cursor, knocked out of the front screen
+            ctx.globalCompositeOperation = "destination-out"
+            ctx.beginPath()
+            ctx.moveTo(76, 50)
+            ctx.lineTo(140, 94)
+            ctx.lineTo(112, 102)
+            ctx.lineTo(100, 130)
+            ctx.closePath()
+            ctx.fill()
+          }
+        }
+      }
+    }
     tooltipText: strings.t("tooltip").arg(root.stateLabel())
     onPressed: function(buttonCode) { root.toggle() }
   }

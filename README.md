@@ -17,7 +17,7 @@ Plugin id: `sippin45.mwb`
 - **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 
-The icon is a single neutral glyph; connection state shows in the panel and
+The icon is drawn in QML after the Mouse Without Borders mark (two screens and a cursor) in the bar's foreground colour; connection state shows in the panel and
 the tooltip, not in the icon colour.
 
 ## How it works
