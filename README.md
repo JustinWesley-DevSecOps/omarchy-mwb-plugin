@@ -18,6 +18,9 @@ Plugin id: `sippin45.mwb`
 - **Settings**: Windows host (with a *Test host* button that tries a TCP
   connect to the control port + 1, 2 s timeout), security key (masked, with
   Show/Hide), `file_fetch` (3-way select) and clipboard sharing.
+- **Control Windows from here**: switch for `bidirectional`. Off, this machine
+  only receives; on, the mouse and keyboard can move over to the Windows host.
+  The service unit has no `-bidi` flag, so this setting alone decides it.
 - **Edges**: four buttons (Left, Right, Top, Bottom) choose which screen edges
   switch to the remote, and a dropdown picks a key (Shift, Ctrl or Alt) that
   must be held to cross, like PowerToys' Easy Mouse. They write `edges` and

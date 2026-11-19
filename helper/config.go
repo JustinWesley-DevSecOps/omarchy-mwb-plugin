@@ -23,6 +23,7 @@ type Changes struct {
 	// switches (written as ["none"]).
 	Edges          []string `json:"edges"`
 	SwitchModifier *string  `json:"switch_modifier"`
+	Bidirectional  *bool    `json:"bidirectional"`
 }
 
 // View is what the panel may see. It never contains the key.
@@ -39,6 +40,7 @@ type View struct {
 	// this helper does not rewrite.
 	EdgesEditable  bool   `json:"edgesEditable"`
 	SwitchModifier string `json:"switchModifier"`
+	Bidirectional  bool   `json:"bidirectional"`
 }
 
 var allEdges = []string{"left", "right", "top", "bottom"}
@@ -330,6 +332,9 @@ func Read(path string) (View, error) {
 	if e, ok := topLevel(lines, "switch_modifier"); ok {
 		v.SwitchModifier = unquote(e.value)
 	}
+	if e, ok := topLevel(lines, "bidirectional"); ok && e.value == "true" {
+		v.Bidirectional = true
+	}
 	return v, nil
 }
 
@@ -369,6 +374,9 @@ func Update(path string, c Changes) error {
 	}
 	if c.SwitchModifier != nil {
 		lines = setKey(lines, "switch_modifier", quote(*c.SwitchModifier))
+	}
+	if c.Bidirectional != nil {
+		lines = setKey(lines, "bidirectional", strconv.FormatBool(*c.Bidirectional))
 	}
 	return writeAtomic(path, []byte(strings.Join(lines, "\n")+"\n"))
 }

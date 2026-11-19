@@ -388,3 +388,52 @@ func TestUpdateRefusesToRewriteMultiLineEdges(t *testing.T) {
 		t.Error("file modified")
 	}
 }
+
+// ---- bidirectional ----
+
+func TestReadBidirectional(t *testing.T) {
+	if v := edgesOf(t, "host = \"h\"\n"); v.Bidirectional {
+		t.Error("unset must read as off")
+	}
+	if v := edgesOf(t, "bidirectional = true  # both ways\n"); !v.Bidirectional {
+		t.Error("true not read")
+	}
+	if v := edgesOf(t, "bidirectional = false\n"); v.Bidirectional {
+		t.Error("false read as true")
+	}
+}
+
+func TestUpdateBidirectional(t *testing.T) {
+	p := writeTmp(t, sample+"")
+	if err := Update(p, Changes{Bidirectional: ptr(true)}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	got := string(b)
+	if !strings.Contains(got, "bidirectional = true") {
+		t.Errorf("not written:\n%s", got)
+	}
+	if strings.Index(got, "bidirectional") > strings.Index(got, "[extra]") {
+		t.Errorf("landed inside a table:\n%s", got)
+	}
+	if err := Update(p, Changes{Bidirectional: ptr(false)}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ = os.ReadFile(p)
+	if !strings.Contains(string(b), "bidirectional = false") || strings.Count(string(b), "bidirectional") != 1 {
+		t.Errorf("not replaced in place:\n%s", b)
+	}
+	if !strings.Contains(string(b), `key = "SECRETKEY12345"`) {
+		t.Error("lost the key")
+	}
+}
+
+func TestUpdateBidirectionalUntouchedWhenOmitted(t *testing.T) {
+	p := writeTmp(t, sample)
+	if err := Update(p, Changes{Host: ptr("h.example")}); err != nil {
+		t.Fatal(err)
+	}
+	if b, _ := os.ReadFile(p); strings.Contains(string(b), "bidirectional") {
+		t.Errorf("added without being asked:\n%s", b)
+	}
+}

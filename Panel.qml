@@ -32,7 +32,7 @@ Panel {
 
   // ---- state ----
   property var cfg: ({ host: "", keySet: false, fileFetch: "immediate", clipboard: true, port: 0,
-                          edges: ["left", "right", "top", "bottom"], edgesEditable: true, switchModifier: "" })
+                          edges: ["left", "right", "top", "bottom"], edgesEditable: true, switchModifier: "", bidirectional: false })
   property bool cfgLoaded: false
   property string svcState: "unknown"
   property string conn: "unknown"
@@ -48,11 +48,13 @@ Panel {
   property bool draftClipboard: true
   property var draftEdges: ["left", "right", "top", "bottom"]
   property string draftModifier: ""
+  property bool draftBidirectional: false
   property bool showKey: false
 
   readonly property bool dirty: cfgLoaded && (draftHost !== cfg.host || draftKey !== ""
     || draftFileFetch !== cfg.fileFetch || draftClipboard !== cfg.clipboard
-    || edgesChanged || draftModifier !== cfg.switchModifier)
+    || edgesChanged || draftModifier !== cfg.switchModifier
+    || draftBidirectional !== cfg.bidirectional)
   readonly property bool edgesChanged: cfg.edgesEditable && draftEdges.join(",") !== cfg.edges.join(",")
   readonly property bool running: svcState === "active" || svcState === "activating"
   readonly property bool canToggle: svcState !== "unknown" && svcState !== "deactivating" && !busy
@@ -99,6 +101,7 @@ Panel {
       draftClipboard = cfg.clipboard
       draftEdges = cfg.edges
       draftModifier = cfg.switchModifier
+      draftBidirectional = cfg.bidirectional
       draftKey = ""
     })
   }
@@ -132,6 +135,7 @@ Panel {
     // Only send what changed, so an untouched config never grows new lines.
     if (edgesChanged) change.edges = draftEdges
     if (draftModifier !== cfg.switchModifier) change.switch_modifier = draftModifier
+    if (draftBidirectional !== cfg.bidirectional) change.bidirectional = draftBidirectional
     run([helperPath, "set"], JSON.stringify(change), function(r) {
       busy = false
       if (!r.ok) { say(r.error, true); return }
@@ -216,7 +220,7 @@ Panel {
     open: root.opened
     focusTarget: panel.loadedContent
     contentWidth: panel.fittedContentWidth(Style.space(360))
-    contentHeight: panel.fittedContentHeight(panel.loadedContentHeight, Style.space(640))
+    contentHeight: panel.fittedContentHeight(panel.loadedContentHeight, Style.space(900))
 
     content: PanelKeyCatcher {
       id: keyCatcher
@@ -346,6 +350,16 @@ Panel {
           foreground: root.foreground
           fontFamily: root.fontFamily
           onClicked: root.draftClipboard = !root.draftClipboard
+        }
+
+        Toggle {
+          width: parent.width
+          label: strings.t("bidirectional")
+          description: strings.t("bidirectionalDesc")
+          checked: root.draftBidirectional
+          foreground: root.foreground
+          fontFamily: root.fontFamily
+          onClicked: root.draftBidirectional = !root.draftBidirectional
         }
 
         Column {

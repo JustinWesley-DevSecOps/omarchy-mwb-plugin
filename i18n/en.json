@@ -38,11 +38,13 @@
   "edge.right": "Right",
   "edge.top": "Top",
   "edge.bottom": "Bottom",
-  "edgesDesc": "Wayland only, and only used when bidirectional control is on.",
+  "edgesDesc": "Wayland only. Needs the switch above to be on.",
   "edgesManual": "The edges list in config.toml spans several lines. Edit it by hand.",
   "switchModifier": "Hold a key to switch",
   "modifier.none": "No key needed",
   "modifier.shift": "Shift",
   "modifier.ctrl": "Ctrl",
-  "modifier.alt": "Alt"
+  "modifier.alt": "Alt",
+  "bidirectional": "Control Windows from here",
+  "bidirectionalDesc": "Move the mouse and keyboard over to the Windows host"
 }
