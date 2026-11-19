@@ -18,6 +18,12 @@ Plugin id: `sippin45.mwb`
 - **Settings**: Windows host (with a *Test host* button that tries a TCP
   connect to the control port + 1, 2 s timeout), security key (masked, with
   Show/Hide), `file_fetch` (3-way select) and clipboard sharing.
+- **Edges**: four buttons (Left, Right, Top, Bottom) choose which screen edges
+  switch to the remote, and a dropdown picks a key (Shift, Ctrl or Alt) that
+  must be held to cross, like PowerToys' Easy Mouse. They write `edges` and
+  `switch_modifier`. Wayland only, and `mwb` only uses them when bidirectional
+  control is on. With no edge selected the panel writes `edges = ["none"]`.
+  An `edges` array spread over several lines is left alone; edit it by hand.
 - **Save** writes the file. If the saved file is newer than the running service, the panel says
   the changes are not applied yet.
 

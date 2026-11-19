@@ -31,7 +31,8 @@ Panel {
   Commons.Translations { id: strings; directory: Qt.resolvedUrl("i18n") }
 
   // ---- state ----
-  property var cfg: ({ host: "", keySet: false, fileFetch: "immediate", clipboard: true, port: 0 })
+  property var cfg: ({ host: "", keySet: false, fileFetch: "immediate", clipboard: true, port: 0,
+                          edges: ["left", "right", "top", "bottom"], edgesEditable: true, switchModifier: "" })
   property bool cfgLoaded: false
   property string svcState: "unknown"
   property string conn: "unknown"
@@ -45,10 +46,14 @@ Panel {
   property string draftKey: ""
   property string draftFileFetch: "immediate"
   property bool draftClipboard: true
+  property var draftEdges: ["left", "right", "top", "bottom"]
+  property string draftModifier: ""
   property bool showKey: false
 
   readonly property bool dirty: cfgLoaded && (draftHost !== cfg.host || draftKey !== ""
-    || draftFileFetch !== cfg.fileFetch || draftClipboard !== cfg.clipboard)
+    || draftFileFetch !== cfg.fileFetch || draftClipboard !== cfg.clipboard
+    || edgesChanged || draftModifier !== cfg.switchModifier)
+  readonly property bool edgesChanged: cfg.edgesEditable && draftEdges.join(",") !== cfg.edges.join(",")
   readonly property bool running: svcState === "active" || svcState === "activating"
   readonly property bool canToggle: svcState !== "unknown" && svcState !== "deactivating" && !busy
 
@@ -57,6 +62,15 @@ Panel {
     if (svcState === "active" && (conn === "connected" || conn === "connecting"))
       s += " · " + strings.t("conn." + conn)
     return s
+  }
+
+  readonly property var edgeNames: ["left", "right", "top", "bottom"]
+
+  // Keeps the draft in left, right, top, bottom order, as the helper writes it.
+  function toggleEdge(name) {
+    draftEdges = edgeNames.filter(function(e) {
+      return e === name ? draftEdges.indexOf(e) < 0 : draftEdges.indexOf(e) >= 0
+    })
   }
 
   function say(text, isError) {
@@ -83,6 +97,8 @@ Panel {
       draftHost = cfg.host
       draftFileFetch = cfg.fileFetch
       draftClipboard = cfg.clipboard
+      draftEdges = cfg.edges
+      draftModifier = cfg.switchModifier
       draftKey = ""
     })
   }
@@ -113,6 +129,9 @@ Panel {
     say("", false)
     var change = { host: draftHost.trim(), file_fetch: draftFileFetch, clipboard: draftClipboard }
     if (draftKey !== "") change.key = draftKey
+    // Only send what changed, so an untouched config never grows new lines.
+    if (edgesChanged) change.edges = draftEdges
+    if (draftModifier !== cfg.switchModifier) change.switch_modifier = draftModifier
     run([helperPath, "set"], JSON.stringify(change), function(r) {
       busy = false
       if (!r.ok) { say(r.error, true); return }
@@ -327,6 +346,62 @@ Panel {
           foreground: root.foreground
           fontFamily: root.fontFamily
           onClicked: root.draftClipboard = !root.draftClipboard
+        }
+
+        Column {
+          width: parent.width
+          spacing: Style.space(4)
+          opacity: root.cfg.edgesEditable ? 1 : 0.4
+          Text {
+            textFormat: Text.PlainText
+            color: root.dim
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            text: strings.t("edges")
+          }
+          Row {
+            id: edgeRow
+            width: parent.width
+            spacing: Style.space(8)
+            Repeater {
+              model: root.edgeNames
+              Button {
+                required property string modelData
+                width: (edgeRow.width - edgeRow.spacing * 3) / 4
+                text: strings.t("edge." + modelData)
+                bordered: true
+                selected: root.draftEdges.indexOf(modelData) >= 0
+                enabled: root.cfg.edgesEditable
+                foreground: root.foreground
+                fontFamily: root.fontFamily
+                onClicked: root.toggleEdge(modelData)
+              }
+            }
+          }
+          Text {
+            width: parent.width
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+            color: root.dim
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            text: root.cfg.edgesEditable ? strings.t("edgesDesc") : strings.t("edgesManual")
+          }
+        }
+
+        Dropdown {
+          width: parent.width
+          label: strings.t("switchModifier")
+          value: root.draftModifier
+          foreground: root.foreground
+          fontFamily: root.fontFamily
+          options: [
+            { value: "", label: strings.t("modifier.none") },
+            { value: "shift", label: strings.t("modifier.shift") },
+            { value: "ctrl", label: strings.t("modifier.ctrl") },
+            { value: "alt", label: strings.t("modifier.alt") }
+          ]
+          onChanged: function(v) { root.draftModifier = v }
         }
 
         Text {

@@ -254,3 +254,137 @@ func TestActionAllowList(t *testing.T) {
 		}
 	}
 }
+
+// ---- edges and switch_modifier ----
+
+func edgesOf(t *testing.T, content string) View {
+	t.Helper()
+	v, err := Read(writeTmp(t, content))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return v
+}
+
+func TestReadEdges(t *testing.T) {
+	cases := []struct {
+		name, toml string
+		want       []string
+		editable   bool
+	}{
+		{"unset means all four", "host = \"h\"\n", []string{"left", "right", "top", "bottom"}, true},
+		{"subset in canonical order", "edges = [\"bottom\", \"left\"]\n", []string{"left", "bottom"}, true},
+		{"none", "edges = [\"none\"]\n", []string{}, true},
+		{"off is none", "edges = [\"off\"]  # no edges\n", []string{}, true},
+		{"empty array is all four", "edges = []\n", []string{"left", "right", "top", "bottom"}, true},
+		{"unknown names ignored", "edges = [\"left\", \"diagonal\"]\n", []string{"left"}, true},
+		{"multi-line array is not editable", "edges = [\n  \"left\",\n  \"right\",\n]\n", []string{"left", "right", "top", "bottom"}, false},
+	}
+	for _, c := range cases {
+		v := edgesOf(t, c.toml)
+		if strings.Join(v.Edges, ",") != strings.Join(c.want, ",") || v.EdgesEditable != c.editable {
+			t.Errorf("%s: got %v editable=%v, want %v editable=%v", c.name, v.Edges, v.EdgesEditable, c.want, c.editable)
+		}
+		if v.Edges == nil {
+			t.Errorf("%s: Edges must be a non-nil slice so it serialises as []", c.name)
+		}
+	}
+}
+
+func TestReadSwitchModifier(t *testing.T) {
+	if v := edgesOf(t, "host = \"h\"\n"); v.SwitchModifier != "" {
+		t.Errorf("unset: %q", v.SwitchModifier)
+	}
+	if v := edgesOf(t, "switch_modifier = \"shift\"  # easy mouse\n"); v.SwitchModifier != "shift" {
+		t.Errorf("shift: %q", v.SwitchModifier)
+	}
+}
+
+func TestUpdateEdgesWritesCanonicalList(t *testing.T) {
+	p := writeTmp(t, sample)
+	if err := Update(p, Changes{Edges: []string{"top", "left"}}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	got := string(b)
+	if !strings.Contains(got, `edges = ["left", "top"]`) {
+		t.Errorf("edges not rewritten:\n%s", got)
+	}
+	for _, want := range []string{"# my mwb config", `key = "SECRETKEY12345"`, "[extra]", `file_fetch = "on_switch"`} {
+		if !strings.Contains(got, want) {
+			t.Errorf("lost %q", want)
+		}
+	}
+}
+
+func TestUpdateNoEdgesSelectedWritesNone(t *testing.T) {
+	p := writeTmp(t, sample)
+	if err := Update(p, Changes{Edges: []string{}}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	if !strings.Contains(string(b), `edges = ["none"]`) {
+		t.Errorf("expected none:\n%s", b)
+	}
+}
+
+func TestUpdateEdgesAddedAboveTables(t *testing.T) {
+	p := writeTmp(t, "host = \"h\"\n\n[extra]\nx = 1\n")
+	if err := Update(p, Changes{Edges: []string{"right"}, SwitchModifier: ptr("alt")}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	got := string(b)
+	if strings.Index(got, "edges") > strings.Index(got, "[extra]") || strings.Index(got, "switch_modifier") > strings.Index(got, "[extra]") {
+		t.Errorf("new keys landed inside a table:\n%s", got)
+	}
+	if !strings.Contains(got, `switch_modifier = "alt"`) {
+		t.Errorf("modifier missing:\n%s", got)
+	}
+}
+
+func TestUpdateEdgesUntouchedWhenOmitted(t *testing.T) {
+	p := writeTmp(t, sample)
+	if err := Update(p, Changes{Host: ptr("h.example")}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	if strings.Contains(string(b), "switch_modifier") || !strings.Contains(string(b), `edges = ["left", "right"]`) {
+		t.Errorf("edge settings changed without being asked:\n%s", b)
+	}
+}
+
+func TestEdgeValidation(t *testing.T) {
+	bad := []Changes{
+		{Edges: []string{"diagonal"}},
+		{Edges: []string{"left", "left"}},
+		{Edges: []string{"none"}},
+		{SwitchModifier: ptr("super")},
+		{SwitchModifier: ptr("shift\"")},
+	}
+	for _, c := range bad {
+		p := writeTmp(t, sample)
+		if err := Update(p, c); err == nil {
+			t.Errorf("accepted %+v", c)
+		}
+		if b, _ := os.ReadFile(p); string(b) != sample {
+			t.Errorf("file modified despite rejected %+v", c)
+		}
+	}
+	for _, m := range []string{"", "shift", "ctrl", "alt"} {
+		if err := Update(writeTmp(t, sample), Changes{SwitchModifier: ptr(m)}); err != nil {
+			t.Errorf("modifier %q rejected: %v", m, err)
+		}
+	}
+}
+
+func TestUpdateRefusesToRewriteMultiLineEdges(t *testing.T) {
+	src := "edges = [\n  \"left\",\n]\nhost = \"h\"\n"
+	p := writeTmp(t, src)
+	if err := Update(p, Changes{Edges: []string{"right"}}); err == nil {
+		t.Fatal("expected an error for a multi-line edges array")
+	}
+	if b, _ := os.ReadFile(p); string(b) != src {
+		t.Error("file modified")
+	}
+}

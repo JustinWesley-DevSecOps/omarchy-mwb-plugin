@@ -32,5 +32,17 @@
   "needsRestart": "Saved settings are not applied yet. Turn the service off and on to apply them.",
   "unsaved": "Unsaved changes",
   "loadFailed": "Could not read the config",
-  "helperMissing": "Helper binary not found. Build it (see INSTALL.md)."
+  "helperMissing": "Helper binary not found. Build it (see INSTALL.md).",
+  "edges": "Switch from these edges",
+  "edge.left": "Left",
+  "edge.right": "Right",
+  "edge.top": "Top",
+  "edge.bottom": "Bottom",
+  "edgesDesc": "Wayland only, and only used when bidirectional control is on.",
+  "edgesManual": "The edges list in config.toml spans several lines. Edit it by hand.",
+  "switchModifier": "Hold a key to switch",
+  "modifier.none": "No key needed",
+  "modifier.shift": "Shift",
+  "modifier.ctrl": "Ctrl",
+  "modifier.alt": "Alt"
 }

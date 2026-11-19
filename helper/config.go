@@ -19,6 +19,10 @@ type Changes struct {
 	Key       *string `json:"key"`
 	FileFetch *string `json:"file_fetch"`
 	Clipboard *bool   `json:"clipboard"`
+	// Edges: nil leaves the setting alone, an empty slice means no edge
+	// switches (written as ["none"]).
+	Edges          []string `json:"edges"`
+	SwitchModifier *string  `json:"switch_modifier"`
 }
 
 // View is what the panel may see. It never contains the key.
@@ -28,6 +32,81 @@ type View struct {
 	FileFetch string `json:"fileFetch"`
 	Clipboard bool   `json:"clipboard"`
 	Port      int    `json:"port"`
+	// Edges is the resolved list of edges that switch to the remote, in
+	// canonical order. Never nil, so it serialises as [] when none are enabled.
+	Edges []string `json:"edges"`
+	// EdgesEditable is false when the edges array spans several lines, which
+	// this helper does not rewrite.
+	EdgesEditable  bool   `json:"edgesEditable"`
+	SwitchModifier string `json:"switchModifier"`
+}
+
+var allEdges = []string{"left", "right", "top", "bottom"}
+
+func validEdge(e string) bool {
+	for _, a := range allEdges {
+		if e == a {
+			return true
+		}
+	}
+	return false
+}
+
+// canonicalEdges orders a set of edges left, right, top, bottom.
+func canonicalEdges(in []string) []string {
+	out := []string{}
+	for _, a := range allEdges {
+		for _, e := range in {
+			if e == a {
+				out = append(out, a)
+				break
+			}
+		}
+	}
+	return out
+}
+
+func multiLineArray(raw string) bool {
+	return strings.HasPrefix(raw, "[") && !strings.Contains(raw, "]")
+}
+
+// resolveEdges mirrors mwb's own EnabledEdges: unset or empty means all four,
+// "none"/"off" means none, otherwise the valid names listed.
+func resolveEdges(raw string) []string {
+	body := strings.TrimSpace(raw)
+	body = strings.TrimPrefix(body, "[")
+	body = strings.TrimSuffix(body, "]")
+	var names []string
+	for _, part := range strings.Split(body, ",") {
+		if n := unquote(strings.TrimSpace(part)); n != "" {
+			names = append(names, n)
+		}
+	}
+	if len(names) == 0 {
+		return append([]string{}, allEdges...)
+	}
+	var valid []string
+	for _, n := range names {
+		switch {
+		case validEdge(n):
+			valid = append(valid, n)
+		case n == "none" || n == "off":
+			return []string{}
+		}
+	}
+	return canonicalEdges(valid)
+}
+
+func edgesLiteral(edges []string) string {
+	e := canonicalEdges(edges)
+	if len(e) == 0 {
+		return `["none"]`
+	}
+	q := make([]string, len(e))
+	for i, n := range e {
+		q[i] = quote(n)
+	}
+	return "[" + strings.Join(q, ", ") + "]"
 }
 
 var hostLabel = regexp.MustCompile(`^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$`)
@@ -77,6 +156,25 @@ func (c Changes) Validate() error {
 		case "immediate", "on_switch", "off":
 		default:
 			return errors.New("file_fetch must be immediate, on_switch or off")
+		}
+	}
+	if c.Edges != nil {
+		seen := map[string]bool{}
+		for _, e := range c.Edges {
+			if !validEdge(e) {
+				return errors.New("edges must be left, right, top or bottom")
+			}
+			if seen[e] {
+				return errors.New("edges must not repeat")
+			}
+			seen[e] = true
+		}
+	}
+	if c.SwitchModifier != nil {
+		switch *c.SwitchModifier {
+		case "", "shift", "ctrl", "alt":
+		default:
+			return errors.New("switch_modifier must be empty, shift, ctrl or alt")
 		}
 	}
 	return nil
@@ -204,7 +302,7 @@ func Read(path string) (View, error) {
 		return View{}, err
 	}
 	lines := splitLines(b)
-	v := View{Clipboard: true, FileFetch: "immediate"}
+	v := View{Clipboard: true, FileFetch: "immediate", Edges: append([]string{}, allEdges...), EdgesEditable: true}
 	if e, ok := topLevel(lines, "host"); ok {
 		v.Host = unquote(e.value)
 	}
@@ -221,6 +319,16 @@ func Read(path string) (View, error) {
 	}
 	if e, ok := topLevel(lines, "port"); ok {
 		v.Port, _ = strconv.Atoi(e.value)
+	}
+	if e, ok := topLevel(lines, "edges"); ok {
+		if multiLineArray(e.value) {
+			v.EdgesEditable = false
+		} else {
+			v.Edges = resolveEdges(e.value)
+		}
+	}
+	if e, ok := topLevel(lines, "switch_modifier"); ok {
+		v.SwitchModifier = unquote(e.value)
 	}
 	return v, nil
 }
@@ -239,6 +347,11 @@ func Update(path string, c Changes) error {
 		return err
 	}
 	lines := splitLines(b)
+	if c.Edges != nil {
+		if e, ok := topLevel(lines, "edges"); ok && multiLineArray(e.value) {
+			return errors.New("edges spans several lines in config.toml; edit it by hand")
+		}
+	}
 	if c.Host != nil {
 		lines = setKey(lines, "host", quote(*c.Host))
 	}
@@ -250,6 +363,12 @@ func Update(path string, c Changes) error {
 	}
 	if c.Clipboard != nil {
 		lines = setKey(lines, "clipboard", strconv.FormatBool(*c.Clipboard))
+	}
+	if c.Edges != nil {
+		lines = setKey(lines, "edges", edgesLiteral(c.Edges))
+	}
+	if c.SwitchModifier != nil {
+		lines = setKey(lines, "switch_modifier", quote(*c.SwitchModifier))
 	}
 	return writeAtomic(path, []byte(strings.Join(lines, "\n")+"\n"))
 }
